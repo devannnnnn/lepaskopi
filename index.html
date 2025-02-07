@@ -15,15 +15,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;1,700&display=swap" rel="stylesheet">
 
 <!-- feather icons -->
-<script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
 
 <!-- my style -->
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 <body>
     
 <!-- navbar start -->
-<nav class="navbar">
+<nav class="navbar" x-data>
      <a href="#" class="navbar-logo">Lepas<span>Kopi</span>.</a>
 
      <div class="navbar-nav">
@@ -36,7 +37,10 @@
 
      <div class="navbar-extra">  
         <a href="#" id="search-button"><i data-feather="search"></i></a>
-        <a href="#" id="shopping-cart-button"><i data-feather="shopping-cart"></i></a>
+        <a href="#" id="shopping-cart-button">
+            <i data-feather="shopping-cart"></i>
+            <span class="quantity-badge" x-show="$store.cart.quantity" x-text="$store.cart.quantity"></span>
+        </a>
         <a href="#" id="hamburger-menu"><i data-feather="menu"></i></a>
      </div>
 
@@ -48,33 +52,53 @@
      <!-- search from end -->
 
      <!-- shopping cart start -->
+      
       <div class="shopping-cart">
+        <template x-for="(item, index) in $store.cart.items" x-keys="index">
         <div class="cart-item">
-            <img src="img/products/1.jpg.jpg" alt="product 1">
+            <img :src="`img/products/${item.img}`" :alt="item.name">
             <div class="item-detail">
-                <h3>product 1</h3>
-                <div class="item-price">idr 30k</div>
+                <h3 x-text="item.name"></h3>
+                <div class="item-price">
+                    <span x-text="rupiah(item.price)"></span> &times;
+                    <button id="remove" @click="$store.cart.remove(item.id)">&minus;</button> 
+                    <span x-text="item.quantity"></span>
+                    <button id="add" @click="$store.cart.add(item)">&plus;</button> &equals;
+                    <span x-text="rupiah(item.total)"></span>
+                </div>
             </div>
-            <i data-feather="trash-2" class="remove-item"></i>
-        </div>
-        <div class="cart-item">
-            <img src="img/products/1.jpg.jpg" alt="product 1">
-            <div class="item-detail">
-                <h3>product 1</h3>
-                <div class="item-price">idr 30k</div>
-            </div>
-            <i data-feather="trash-2" class="remove-item"></i>
-        </div>
-        <div class="cart-item">
-            <img src="img/products/1.jpg.jpg" alt="product 1">
-            <div class="item-detail">
-                <h3>product 1</h3>
-                <div class="item-price">idr 30k</div>
-            </div>
-            <i data-feather="trash-2" class="remove-item"></i>
-        </div>      
-      </div>
+        </div>  
+
+    </template>
+    <h4 x-show="!$store.cart.items.length" style="margin-top: 1rem;">cart is empty</h4>
+    <h4 x-show="$store.cart.items.length">total : <span x-text="rupiah($store.cart.total)"></span></h4>
+    
+    <div class="form-container" x-show="$store.cart.items.length">
+        <form action="" id="checkoutForm">
+        <h5>customer detail</h5>
+
+            <label for="name">
+                <span>Name</span>
+                <input type="text" name="name" id="name">
+            </label>
+
+            <label for="email">
+                <span>Email</span>
+                <input type="email" name="email" id="email">
+            </label>
+
+            <label for="phone">
+                <span>Phone</span>
+                <input type="number" name="phone" id="phone" autocomplete="off">
+            </label>
+
+            <button class="checkout-button" type="submit" id="checkout-button" value="checkout">checkout</button>
+        </form>
+    </div>
+    </div>  
      <!-- shopping cart end -->
+
+
 
 </nav>
 <!-- navbar end -->
@@ -119,13 +143,13 @@
             <p class="menu-card-price">IDR 23K</p>
         </div>
         <div class="menu-card">
-            <img src="img/menu1.jpg.jpg" alt="Latte Art" class="menu-card-img">
+            <img src="img/menu2.1.jpg" alt="Latte Art" class="menu-card-img" >
             <h3 class="menu-card-title">- Latte Art -</h3>
             <p class="menu-card-price">IDR 23K</p>
         </div>
         <div class="menu-card">
-            <img src="img/menu1.jpg.jpg" alt="Latte Art" class="menu-card-img">
-            <h3 class="menu-card-title">- Latte Art -</h3>
+            <img src="img/menu3.jpg" alt="Latte Art" class="menu-card-img">
+            <h3 class="menu-card-title">- Latte Art Matcha-</h3>
             <p class="menu-card-price">IDR 23K</p>
         </div>
         <div class="menu-card">
@@ -139,19 +163,26 @@
 <!-- menu section end -->
 
 <!-- products section start -->
- <section class="products" id="products">
+ <section class="products" id="products" x-data="products">
     <h2><span>produk unggulan</span> kami</h2>
+    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Minus ex excepturi vitae.</p>
+    
      <div class="row">
-        <div class="product-card">
+     <template x-for="(item, index) in items" x-key="index">
+        <div class="product-card">  
             <div class="product-icons">
-                <a href="#"><i data-feather="shopping-cart"></i></a>
-                <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
+                <a href="#" @click.prevent="$store.cart.add(item)">
+                    <img src="img/shopping-cart.svg" alt="Shopping Cart">
+                </a>
+                <a href="#" class="item-detail-button">
+                    <img src="img/eye.svg" alt="Eye">
+                </a>
             </div>
             <div class="product-image">
-                <img src="img/products/1.jpg.jpg" alt="product 1">
+                <img :src="`img/products/${item.img}`" :alt="item.name">
             </div>
             <div class="product-content">
-                <h3>coffee beans 1</h3>
+                <h3 x-text="item.name"></h3>
                 <div class="product-stars">
                     <i data-feather="star" class="star-full"></i>
                     <i data-feather="star" class="star-full"></i>
@@ -159,69 +190,10 @@
                     <i data-feather="star" class="star-full"></i>
                     <i data-feather="star"></i>
                 </div>
-                <div class="product-price">IDR 25K </div>
+                <div class="product-price"><span x-text="rupiah(item.price)"></span></div>
             </div>
         </div>
-        <div class="product-card">
-            <div class="product-icons">
-                <a href="#"><i data-feather="shopping-cart"></i></a>
-                <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
-            </div>
-            <div class="product-image">
-                <img src="img/products/1.jpg.jpg" alt="product 1">
-            </div>
-            <div class="product-content">
-                <h3>coffee beans 1</h3>
-                <div class="product-stars">
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star"></i>
-                </div>
-                <div class="product-price">IDR 25K </div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-icons">
-                <a href="#"><i data-feather="shopping-cart"></i></a>
-                <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
-            </div>
-            <div class="product-image">
-                <img src="img/products/1.jpg.jpg" alt="product 1">
-            </div>
-            <div class="product-content">
-                <h3>coffee beans 1</h3>
-                <div class="product-stars">
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star"></i>
-                </div>
-                <div class="product-price">IDR 25K </div>
-            </div>
-        </div>
-        <div class="product-card">
-            <div class="product-icons">
-                <a href="#"><i data-feather="shopping-cart"></i></a>
-                <a href="#" class="item-detail-button"><i data-feather="eye"></i></a>
-            </div>
-            <div class="product-image">
-                <img src="img/products/1.jpg.jpg" alt="product 1">
-            </div>
-            <div class="product-content">
-                <h3>coffee beans 1</h3>
-                <div class="product-stars">
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star" class="star-full"></i>
-                    <i data-feather="star"></i>
-                </div>
-                <div class="product-price">IDR 25K </div>
-            </div>
-        </div>
+    </template>
         </div>
      </div>
  </section>
@@ -283,7 +255,7 @@
             <a href="#" class="close-icon"><i data-feather="x"></i></a>
             <div class="modal-content">
                 <div class="modal-image">
-                    <img src="img/products/1.jpg.jpg" alt="product 1">
+                    <img src="img/products/1.jpg" alt="product 1">
                 </div>
                 <div class="product-content">
                     <h3>product 1</h3>
@@ -304,6 +276,7 @@
         </div>
     </div>
 <!-- modal box item detail end -->
+    <script src="js/script.js"></script>
 
     <!-- feather icons -->
     <script>
@@ -311,6 +284,11 @@
       </script>
 
       <!-- my javascript -->
-      <script src="js/script.js"></script>
+      
+    <!-- alpineJS -->
+     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+     <!-- app  -->
+      <script src="src/app.js"></script>
 </body>
 </html>
